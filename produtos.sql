@@ -28,6 +28,34 @@ log_data timestamp,
 foreign key(id_fornecedor) references companies(id_companie)
 );
 
+create table clients(
+id_client int auto_increment primary key,
+firstname varchar(50),
+lastname varchar(50),
+middlename varchar(50),
+bday date
+);
+
+create table buy_order(
+id_order int auto_increment primary key,
+qtd_item int,
+total_value float,
+cli_reference int default 0,
+date_buy timestamp,
+foreign key (cli_reference) references clients(id_client)
+);
+
+create table stock_order(
+id_product int,
+id_buy_order int,
+id_client int,
+foreign key (id_product) references products(id_produto),
+foreign key (id_buy_order) references buy_order(id_order),
+foreign key (id_client) references clients(id_client)
+);
+
+drop table stock_order;
+drop table buy_order;
 #----------------------------------------------------------------------------------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,12 +101,46 @@ insert into products(n_produto, id_fornecedor, qtd, valor, data_compra) values
 ('Soda Antartica 2L', 4, 250, 8.5, '2022-10-20'),
 ('Trakinas Chocolate', 2, 600, 4.80, '2022-09-04'),
 ('Bis', 2, 800, 5.20, '2022-09-04');
+
+insert into clients(firstname, lastname, middlename, bday) values('João','','Andrade','1987-06-12');
+insert into clients(firstname, lastname, middlename, bday) values('Andréia','','Pizzi','1992-02-19');
+insert into clients(firstname, lastname, middlename, bday) values('Paulo Henrique','Loureiro','Amorim','1965-11-22');
+insert into clients(firstname, lastname, middlename, bday) values('Victor','Santana','Frota','1988-02-07');
+insert into clients(firstname, lastname, middlename, bday) values('Ana Paula','','Todisco','1986-10-04');
+insert into clients(firstname, lastname, middlename, bday) values('Larissa','Souza','Brandão','1995-05-30');
+insert into clients(firstname, lastname, middlename, bday) values('Gabriel Felipe','','Nascimento','1998-01-29');
+insert into clients(firstname, lastname, middlename, bday) values('Enzo','Oliveira','Andrade','2000-12-20');
+insert into clients(firstname, lastname, middlename, bday) values('Jhennyfer','da Silva','Chaves','2001-06-09');
+insert into clients(firstname, lastname, middlename, bday) values('Mauro','Magalhães','Ribeiro','1973-07-14');
+insert into clients(firstname, lastname, middlename, bday) values('Critina','','Rocha','1982-06-21');
+insert into clients(firstname, lastname, middlename, bday) values('Bruno','','Monteiro','1988-05-10');
+
+
+insert into stock_order(id_product, id_buy_order) values
+(13,1), (2,1), (9,2), (20,1), (9,1), (5,3), (6,1), (19,2), (25,2),(10,2),(3,3),(10,1),(4,1),(12,3),(27,2);
+
+insert into buy_order(cli_reference) values (1);
+insert into buy_order(cli_reference) values (2);
+insert into buy_order(cli_reference) values (3);
+insert into buy_order(cli_reference) values (4);
+insert into buy_order(cli_reference) values (5);
+insert into buy_order(cli_reference) values (6);
+insert into buy_order(cli_reference) values (7);
+insert into buy_order(cli_reference) values (8);
+insert into buy_order(cli_reference) values (9);
+insert into buy_order(cli_reference) values (10);
+insert into buy_order(cli_reference) values (11);
+insert into buy_order(cli_reference) values (12);
+
 #----------------------------------------------------------------------------------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------
 # =========================================================Selects===================================================================================
 select * from products;
 select * from companies;
+select * from clients;
+select * from buy_order;
+select * from stock_order;
 
 select * from companies
 inner join products
@@ -96,6 +158,22 @@ on id_companie = id_fornecedor
 order by id_produto;
 #----------------------------------------------------------------------------------------------------------------------------------------------------
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------
+# ================================================================Views==============================================================================
+create view stock_now as
+select products.n_produto as 'Item', companies.c_name as 'Fornecedor', products.qtd, concat('R$ ',(products.qtd * products.valor)) as 'Valor Faturado'
+from companies inner join products on id_companie = id_fornecedor order by id_produto;
+
+create or replace view stock_now as
+select products.n_produto as 'Item', companies.c_name as 'Fornecedor', products.qtd, concat('R$ ',(products.qtd * products.valor)) as 'Valor Faturado'
+from companies inner join products on id_companie = id_fornecedor order by id_produto;
+
+alter view stock_now as
+select products.n_produto as 'Item', companies.c_name as 'Fornecedor', products.qtd,
+concat('R$ ',(products.qtd * products.valor)) as 'Valor Faturado' 
+from companies inner join products on id_companie = id_fornecedor order by id_produto;
+
+select * FROM stock_now;
 #----------------------------------------------------------------------------------------------------------------------------------------------------
 select * from products;
 select * from companies;
